@@ -45,7 +45,7 @@ class RepeatedFlashExperiment(tk.Tk):
         
         height_frames_1 = 470
         height_frames_2 = 250
-        width_frames = 680
+        width_frames = 1200
         
         
         

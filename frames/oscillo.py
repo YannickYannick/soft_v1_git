@@ -17,7 +17,7 @@ class Oscilloscope(ttk.Frame):
         super().__init__(**kwargs)
         
         self.update_val  = 0
-        container = ttk.Frame(self, padding=10, height=450, width=800,
+        container = ttk.Frame(self, padding=10, height=450, width=1100,
                               style="Frame.TFrame")
         container.grid(row=0, column=0, sticky="NESW")
         container.grid_propagate(0)
