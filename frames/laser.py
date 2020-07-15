@@ -13,7 +13,7 @@ class Laser(ttk.Frame):
     def __init__(self, parent, **kwargs):
         super().__init__(**kwargs)
         
-        container = ttk.Frame(self, padding=10, height=400, width=800,
+        container = ttk.Frame(self, padding=10, height=400, width=1200,
                               style="Frame.TFrame")
         container.grid(row=0, column=0, sticky="NESW")
         container.grid_propagate(0)

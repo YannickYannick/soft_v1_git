@@ -8,6 +8,7 @@ Created on Thu Jun 25 08:32:01 2020
 import tkinter as tk
 from tkinter import ttk
 from frames import Oven, Laser, Oscilloscope, SampleParametres
+from applications.picoscope9000 import CommunicationPicoscope
 
 
 def set_dpi_awareness(): # à tester
@@ -31,6 +32,7 @@ COLOR_PRESSED_BACKGROUND = "#4390D5"
 class RepeatedFlashExperiment(tk.Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.reglage_1 = "coou"
         
         self["background"] = COLOR_DARK_BACKGROUND
         
@@ -44,7 +46,7 @@ class RepeatedFlashExperiment(tk.Tk):
         container.rowconfigure((0, 1), weight=1)
         
         height_frames_1 = 470
-        height_frames_2 = 250
+        height_frames_2 = 350
         width_frames = 1200
         
         
@@ -60,8 +62,8 @@ class RepeatedFlashExperiment(tk.Tk):
         laser_frame.grid(row=1, column=0, sticky="NESW")
         laser_frame.grid_propagate(0)
         
-        
-        oscillo_frame = Oscilloscope(container, padding=10, 
+        self.communication_picoscope = CommunicationPicoscope(self)
+        oscillo_frame = Oscilloscope(container, self, padding=10, 
                                       height=height_frames_1, 
                                       width=width_frames,style="Main.TFrame")
         oscillo_frame.grid(row=0, column=1, sticky="NESW")

@@ -8,16 +8,15 @@ Created on Thu Jun 25 18:39:04 2020
 
 import tkinter as tk
 from tkinter import ttk
-from applications import PicoscopeFrame
 #import time
 
 
 class Oscilloscope(ttk.Frame):
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, main_frame, **kwargs):
         super().__init__(**kwargs)
-        
+        self.main_frame = main_frame
         self.update_val  = 0
-        container = ttk.Frame(self, padding=10, height=450, width=1100,
+        container = ttk.Frame(self, padding=10, height=450, width=1200,
                               style="Frame.TFrame")
         container.grid(row=0, column=0, sticky="NESW")
         container.grid_propagate(0)
@@ -89,13 +88,13 @@ class Oscilloscope(ttk.Frame):
                                   style="Label.TLabel") 
         average_label.grid(column=0, row=1, sticky="NESW")
         
-        self.average_value = tk.StringVar(value=0.0)
-        
+        self.average_value = tk.StringVar(value=0)#variable int (y->m)
+        self.average_value_before = tk.StringVar(value=0)#get (communication_picoscope) (y->y)
         
         average_scale = ttk.Scale(left_container, orient="horizontal", 
-                                  from_=0, to=5000000, variable = self.average_value)
+                                  from_=0, to=10000, variable = self.average_value)
         average_scale.grid(column=0, row=5, sticky="NESW")
-        #average_scale.bind('<Motion>',self.motion_in_scale)
+        average_scale.bind('<Motion>',self.motion_in_scale)
         
         # round_average_value = tk.StringVar()
         # average = self.average_value.get()
@@ -105,95 +104,20 @@ class Oscilloscope(ttk.Frame):
         
         average_display = ttk.Label(spinbox_container, textvariable=self.average_value, width=8) 
         average_display.grid(column=1, row=1, sticky="NESW")
-        print("avant")
+
         #self.CommunicationPicoscope()
         
-        test = PicoscopeFrame(container, self)
-        test.grid(column=0, row=1, sticky="NESW")
+#        test = PicoscopeFrame(container, self)
+#        test.grid(column=0, row=1, sticky="NESW")
+        self.reglage_1 = self.main_frame.communication_picoscope.picoscope_properties["self.average"]
         
     def motion_in_scale(self,event):
         #print("Mouse position: (%s %s)" % (event.x, event.y))
         received_average = self.average_value.get()
         #self.update_val  = 1
-        #print(received_average)
+        self.main_frame.communication_picoscope.picoscope_properties["self.average"] = received_average
         
     def entry_in_timespinbox(self,event):
         received_time_scale = self.time_scale_value.get()
         self.update_val  = 1
         self.CommunicationPicoscope()
-        #print(received_time_scale)
-        
-
-    #def CommunicationPicoscope(self):
-
-
-        # self.strdata = [1,2,3,4,5]
-        # self.data = [1,2,3,4,5]
-        
-        # for i in range(2000):
-        #     print("self.update_val",self.update_val)
-        #     time.sleep(1)
-        #     if self.update_val == 1 :
-        #         received_time_scale = self.time_scale_value.get()
-        #         print(received_time_scale,i)
-                
-                
-#         ############# MODEL #############
-#         self.COMRCW = win32com.client.Dispatch("PicoScope9000.COMRC") # create COM object   
-#         self.COMRCW.ExecCommand("Gui:Control:Invisible")
-#         self.COMRCW.ExecCommand("Header Off")
-#         # Set up measurements
-#         self.COMRCW.ExecCommand("TB:ScaleA? 1m")  
-#         self.COMRCW.ExecCommand("Meas:Display:Param")
-#         self.COMRCW.ExecCommand("Meas:DisplSrc:Ch1")
-#         self.COMRCW.ExecCommand("Meas:Mode:Single")
-#         self.COMRCW.ExecCommand("Meas:Ch1:XParam:Freq 1")
-#         self.COMRCW.ExecCommand("Meas:Ch1:XParam:Rise 1")
-#         self.COMRCW.ExecCommand("Meas:Ch1:YParam:Max 1")
-#         self.COMRCW.ExecCommand("Meas:Ch1:YParam:Min 1")
-#         self.COMRCW.ExecCommand("Meas:Ch1:YParam:PP 1")
-#         self.COMRCW.ExecCommand("Trig:Mode Trig")
-# #        self.COMRCW.ExecCommand("Trig:Source? Direct")
-#         self.COMRCW.ExecCommand(" ACQuire:CH1:MODE AVGSTAB;NAVG 20")
-        #self.data = range(512)
-#         self.update_val  = 0
-#         self.start()
-
-    
- 
-        
-    #     for i in range(2000):
-    #         pythoncom.CoInitialize()
-
-    #         self.COMRCW = win32com.client.Dispatch("PicoScope9000.COMRC") # create COM object 
-    #         if update_val == 1 :
-    #             self.COMRCW.ExecCommand(self.application.reglage_1) #update time scale
-    #             self.COMRCW.ExecCommand(self.application.reglage_3)
-    #             self.update_val  = 0
-            
-    #         self.strdata = self.COMRCW.ExecCommand("Wfm:Data?") 
-    #         print (self.strdata )
-    #         self.strdata = str(self.strdata)
-           
-    #         self.strdata = self.strdata.split(',')
-           
-    #         self.strdata = np.asarray(self.strdata)
-            
-    #         self.data = self.strdata.astype(np.float)
-            
-      
-    #         self.axe_yy = self.data
-            
-    #         time.sleep(0.2)
-    
-    
-            
-        
-
-# #demo:
-# window = tk.Tk()
-# test_frame = Oscilloscope(window)
-# test_frame.grid()
-
-
-# window.mainloop()
