@@ -8,3 +8,5 @@ Created on Fri Jul 17 10:30:53 2020
 
 
 from communication.pico9000 import CommunicationPicoscope
+from communication.oven import CommunicationOven
+from communication.laser import CommunicationLaser

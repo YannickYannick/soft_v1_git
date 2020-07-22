@@ -11,8 +11,9 @@ Main tk window for the repeated flash experiment GUI
 import tkinter as tk
 from tkinter import ttk
 from frames import OvenSeparate, Oscilloscope, Laser, Sample
-from communication.pico9000 import CommunicationPicoscope
+from communication import CommunicationPicoscope, CommunicationOven, CommunicationLaser
 
+from tools import MainMenu
 COLOR_LIGHT_BACKGROUND = "#D3E2F1"
 COLOR_DARK_BACKGROUND = "#2e3f4f"
 COLOR_TITLE = "#2e3f4f"
@@ -23,6 +24,10 @@ class RepeatedFlashExperiment(tk.Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)      
         self.title("Repeated Flash Experiment")
+        self.main_menu = MainMenu(self)
+        
+        
+        self.config(menu=self.main_menu)
         
         self.columnconfigure((0), weight=1)
         self.rowconfigure((0), weight=1)
@@ -38,16 +43,16 @@ class RepeatedFlashExperiment(tk.Tk):
         container.rowconfigure((1), weight=1)
         container.columnconfigure((0,1), weight=2)
         
-        
-        oven_frame = OvenSeparate(container)   
+        self.communication_oven = CommunicationOven(self)
+        oven_frame = OvenSeparate(container, self)   
         oven_frame.grid(row=0, column=0)
         
         self.communication_picoscope = CommunicationPicoscope(self)
         oscilloscope_frame = Oscilloscope(container, self)   
         oscilloscope_frame.grid(row=0, column=1)
         
-
-        laser_frame = Laser(container) 
+        self.communication_laser = CommunicationLaser(self)
+        laser_frame = Laser(container, self) 
         laser_frame.grid(row=1, column=0)
         
         

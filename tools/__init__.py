@@ -7,3 +7,4 @@ Created on Tue Jun 30 18:09:22 2020
 """
 
 from tools.gauge import Gauge
+from tools.menu import MainMenu

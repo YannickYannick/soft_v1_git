@@ -17,8 +17,10 @@ from tools import Gauge
 
 
 class OvenSeparate(ttk.Frame):
-    def __init__(self, container, **kwargs):
+    def __init__(self, container, main_app, **kwargs):
         super().__init__(container,**kwargs)
+        
+        self.main_app = main_app
         
         self.rowconfigure((1), weight=1)
         self.columnconfigure((0), weight=1)
@@ -54,7 +56,7 @@ class OvenSeparate(ttk.Frame):
         self.manual_bot_container = ManualTemperature(sub_container)
         self.manual_bot_container.grid(row=1, column=0, columnspan=2)
         
-        self.auto_bot_container= AutoTemperature(sub_container,left_container)
+        self.auto_bot_container= AutoTemperature(sub_container,left_container, self)
         self.auto_bot_container.grid(row=1, column=0, columnspan=2)
         
         self.select_advice = SelectAdvice(sub_container)
@@ -481,13 +483,14 @@ class ManualTemperature(ttk.LabelFrame):
     def clear(self):
         for i in range(0,24):
             self.temperature_value[i].set(" ")
+
             
 
             
             
 class AutoTemperature(ttk.LabelFrame):
     
-    def __init__(self, parent, controller, **kwargs):       
+    def __init__(self, parent, controller, oven_frame, **kwargs):       
         super().__init__(parent,**kwargs)
         
         self.rowconfigure((0,1), weight=1)
@@ -499,6 +502,7 @@ class AutoTemperature(ttk.LabelFrame):
         
         self.width=4
         self.controller = controller
+        self.oven_frame = oven_frame
         self.temperature = []
         self.temperature_value = []
 
@@ -535,6 +539,7 @@ class AutoTemperature(ttk.LabelFrame):
         temperature_max = self.controller.temperature_max.get()
         temperature=[]
         
+        
         for i in range(0,24):
             self.temperature_value[i].set(" ")
         
@@ -544,6 +549,8 @@ class AutoTemperature(ttk.LabelFrame):
                 (((int(temperature_max)-int(temperature_min))/
                   (int(number_point)-1))*i))
             self.temperature_value[i].set(f"{temperature[i]}")
+        self.oven_frame.main_app.communication_oven.list_temperatures_ordered = f"{temperature}"
+        self.oven_frame.main_app.communication_oven.update_temperatures()
      
             
     def clear(self):

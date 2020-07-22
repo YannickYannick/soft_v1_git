@@ -517,10 +517,13 @@ class AutoTemperature(ttk.LabelFrame):
         
         
     def validate(self):
+        
         number_point = self.controller.number_point_value.get()
         temperature_min = self.controller.temperature_min.get()
         temperature_max = self.controller.temperature_max.get()
         temperature=[]
+
+        print("temperature :",temperature)
         
         for i in range(0,24):
             self.temperature_value[i].set(" ")
@@ -530,6 +533,7 @@ class AutoTemperature(ttk.LabelFrame):
             temperature[i] = round(int(temperature_min)+
                 (((int(temperature_max)-int(temperature_min))/(int(number_point)-1))*i))
             self.temperature_value[i].set(f"{temperature[i]}")
+        
             
     def clear(self):
         for i in range(0,24):
