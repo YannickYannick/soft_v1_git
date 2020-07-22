@@ -16,7 +16,7 @@ from tools import Gauge
 
 
 
-class Oven(ttk.Frame):
+class OvenSeparate(ttk.Frame):
     def __init__(self, container, **kwargs):
         super().__init__(container,**kwargs)
         
@@ -40,7 +40,10 @@ class Oven(ttk.Frame):
         sub_container.columnconfigure((0,1), weight=1)
         
         
-        left_container = ttk.Frame(sub_container)
+        left_container = LeftContainer(sub_container,
+                        lambda: self.show_frame(self.manual_bot_container),
+                        lambda: self.show_frame(self.auto_bot_container)
+                        )
         left_container.grid(row=0, column=0)
         
         
@@ -51,7 +54,7 @@ class Oven(ttk.Frame):
         self.manual_bot_container = ManualTemperature(sub_container)
         self.manual_bot_container.grid(row=1, column=0, columnspan=2)
         
-        self.auto_bot_container= AutoTemperature(sub_container, self)
+        self.auto_bot_container= AutoTemperature(sub_container,left_container)
         self.auto_bot_container.grid(row=1, column=0, columnspan=2)
         
         self.select_advice = SelectAdvice(sub_container)
@@ -66,21 +69,30 @@ class Oven(ttk.Frame):
                 child["style"]='Frame.TFrame'
             if isinstance(child, tk.ttk.LabelFrame) == True :
                 child["style"]='Label.TLabelframe'
+
                 
+    def show_frame(self,frame):
+        frame.tkraise()
+
+ 
+       
         
+class LeftContainer(ttk.Frame):
+    def __init__(self, container, show_manual, show_auto, **kwargs):
+        super().__init__(container, **kwargs)
         
+        self.show_manual = show_manual
+        self.show_auto = show_auto
         
-########################### left container ###################################
-        
-        left_container.rowconfigure((0,1), weight=1)
-        left_container.columnconfigure((0), weight=1)
+        self.rowconfigure((0,1), weight=1)
+        self.columnconfigure((0), weight=1)
         
         vcmd = (self.register(self.onValidate),
                 '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
         
         
         gauge = Gauge(
-            left_container,
+            self,
             width=300, 
             height=150,
             min_value=0,
@@ -95,7 +107,7 @@ class Oven(ttk.Frame):
         
         
         
-        selection_temp_container= ttk.LabelFrame(left_container,
+        selection_temp_container= ttk.LabelFrame(self,
                                 text="Target Temperatures Entry Mode",
                                 style="Label.TLabelframe"
                                 )
@@ -118,7 +130,7 @@ class Oven(ttk.Frame):
             text="Linear", 
             variable=temperature_selection, 
             value="linear",
-            command =  lambda : self.show_auto(self.auto_bot_container),
+            command =  lambda : self.auto_selected(),
             #takefocus=False
         )
         linear_temperature.grid(row=0, column=0)
@@ -128,7 +140,7 @@ class Oven(ttk.Frame):
             text="Logarithmic", 
             variable=temperature_selection, 
             value="log",
-            command =  lambda : self.show_auto(self.auto_bot_container),
+            command =  lambda : self.auto_selected(),
             #takefocus=False
         )
         log_temperature.grid(row=0, column=1)
@@ -138,7 +150,7 @@ class Oven(ttk.Frame):
             text="Manual", 
             variable=temperature_selection, 
             value="manual",
-            command =  lambda : self.show_manual(self.manual_bot_container),
+            command =  lambda : self.manual_selected(),
             #takefocus=False
         )
         manual_temperature.grid(row=0, column=2)
@@ -216,7 +228,6 @@ class Oven(ttk.Frame):
                 child["validatecommand"] = vcmd
                 child["style"]="Spinbox.TSpinbox"
                 
-                
     def onValidate(self, d, i, P, s, S, v,V, W):        
         # Disallow anything but numbers 
         if S.isdigit():
@@ -227,21 +238,22 @@ class Oven(ttk.Frame):
             self.bell()
             return False
         
-        
-    def show_manual(self,frame):
-        frame.tkraise()
-        self.number_point['state']='disabled'
-        self.temperature_max['state']='disabled'
-        self.temperature_min['state']='disabled'
-        
-    def show_auto(self,frame):
-        frame.tkraise()
+                    
+    def auto_selected(self):
+        self.show_auto()
         self.number_point['state']='normal'
         self.temperature_max['state']='normal'
         self.temperature_min['state']='normal'
-                    
-
         
+        
+    def manual_selected(self):
+        self.show_manual()
+        self.number_point['state']='disabled'
+        self.temperature_max['state']='disabled'
+        self.temperature_min['state']='disabled'
+
+  
+      
         
 class RightContainer(ttk.Frame):
     def __init__(self, container, **kwargs):
@@ -381,8 +393,6 @@ class RightContainer(ttk.Frame):
         dialogue_box.grid(row=0, column=0)
         
         
-        
-        
     def play (self):
         self.play_pressed = True
         value = self.annealing_value.get()
@@ -413,6 +423,7 @@ class RightContainer(ttk.Frame):
             self.bell()
             return False
         
+
     
         
 class ManualTemperature(ttk.LabelFrame):
@@ -471,6 +482,8 @@ class ManualTemperature(ttk.LabelFrame):
         for i in range(0,24):
             self.temperature_value[i].set(" ")
             
+
+            
             
 class AutoTemperature(ttk.LabelFrame):
     
@@ -482,7 +495,7 @@ class AutoTemperature(ttk.LabelFrame):
         
         self["style"] = "Label.TLabelframe"
         self["text"] = "Target Temperatures"
-        #self["padding"] = 5
+        
         
         self.width=4
         self.controller = controller
@@ -507,8 +520,8 @@ class AutoTemperature(ttk.LabelFrame):
                             borderwidth=2, relief="ridge", padding=0)
             self.temperature[i].grid(column=i-12, row=1, sticky="NESW")
                
-        validation_button = ttk.Button(self, text="Enter", width=8,  padding=0,
-                                 style="Button.TButton", command=self.validate)
+        validation_button = ttk.Button(self, text="Enter", width=8, padding=0,
+                                style="Button.TButton", command=self.validate)
         validation_button.grid(row=0, column=13, padx=5)
         
         clear_button = ttk.Button(self, text="Clear", width=8, padding=0,
@@ -528,12 +541,15 @@ class AutoTemperature(ttk.LabelFrame):
         for i in range(0,int(number_point)):
             temperature.append(0)
             temperature[i] = round(int(temperature_min)+
-                (((int(temperature_max)-int(temperature_min))/(int(number_point)-1))*i))
+                (((int(temperature_max)-int(temperature_min))/
+                  (int(number_point)-1))*i))
             self.temperature_value[i].set(f"{temperature[i]}")
+     
             
     def clear(self):
         for i in range(0,24):
             self.temperature_value[i].set(" ")
+            
             
             
 class SelectAdvice(ttk.LabelFrame):    
@@ -545,12 +561,10 @@ class SelectAdvice(ttk.LabelFrame):
         
         self["style"] = "Label.TLabelframe"
         self["text"] = "Target Temperatures"
-        #self["padding"] = 5
 
         
-        advice = ttk.Label(self, text="Please select a temperature entry mode",
+        advice = ttk.Label(self,text="Please select a temperature entry mode",
                          padding=10,
                          borderwidth=2, relief="ridge")
         
         advice.place(anchor='center',relx=0.5, rely=0.2)
-        
