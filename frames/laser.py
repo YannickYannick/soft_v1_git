@@ -78,20 +78,20 @@ class LeftContainer(ttk.Frame):
         
         repetition_rate_label = ttk.Label(self, text="Répétition Rate : ")
         repetition_rate_label.grid(row=1, column=0)
-        repetition_rate_value = tk.StringVar()
+        self.repetition_rate_value = tk.StringVar()
         self.repetition_rate = ttk.Combobox(self, 
-                                       textvariable = repetition_rate_value)
-        self.repetition_rate["values"] = ("0", "100","300","700","1000",)
+                                       textvariable = self.repetition_rate_value)
+        self.repetition_rate["values"] = ("0", "10000","15000","20000","30000",)
         self.repetition_rate.grid(row=1, column=1)
         
         
-        pulse_label = ttk.Label(self, text="Pulse Rate (kHz): ")
-        pulse_label.grid(row=2, column=0)
-        pulse_value = tk.StringVar()
-        self.pulse = ttk.Combobox(self, 
-                             textvariable = pulse_value)
-        self.pulse["values"] = ("0", "10", "20", "30")
-        self.pulse.grid(row=2, column=1)
+        burst_label = ttk.Label(self, text="burst Rate (kHz): ")
+        burst_label.grid(row=2, column=0)
+        burst_value = tk.StringVar()
+        self.burst = ttk.Combobox(self, 
+                             textvariable = burst_value)
+        self.burst["values"] = ("0", "100", "200", "400", "800", "16700000")
+        self.burst.grid(row=2, column=1)
         
         
         frequency_label = ttk.Label(self, text="Frequency (kHz): ")
@@ -126,7 +126,7 @@ class RightContainer(ttk.Frame):
         super().__init__(container,**kwargs)
         
         self.laser_frame = laser_frame
-        self.laser_properties = self.laser_frame.main_app.communication_laser.laser_properties.copy() #{"self.state":0, "self.mode":0, "self.current_mode" : 0, "self.pulse_rate" : 0, "self.repetition_rate" : 0, "self.burst_rate" : 0, "self.current_intensity_p":0, "self.light":0}
+        self.laser_properties = self.laser_frame.main_app.communication_laser.laser_properties.copy() #{"self.state":0, "self.mode":0, "self.current_mode" : 0, "self.burst_rate" : 0, "self.repetition_rate" : 0, "self.burst_rate" : 0, "self.current_intensity_p":0, "self.light":0}
         self.laser_commands = self.laser_frame.main_app.communication_laser.laser_commands.copy() 
         
         self.rowconfigure((0,1), weight=1)
@@ -178,8 +178,8 @@ class RightContainer(ttk.Frame):
         self.laser_properties["self.state"] = self.laser_frame.main_app.communication_laser.laser_properties["self.state"]
         self.laser_properties["self.mode"] = self.state
         self.laser_properties["self.current_mode"] = 0 # voir si ce mode est compatible avec burst et continuous (y->y)
-        self.laser_properties["self.pulse_rate"] = self.laser_frame.left_container.pulse.get() 
-        self.aa = self.laser_frame.left_container.repetition_rate.get() 
+        self.laser_properties["self.burst_rate"] = self.laser_frame.left_container.burst.get() 
+        self.aa = self.laser_frame.left_container.repetition_rate_value.get() 
         self.laser_properties["self.repetition_rate"] = self.aa
         self.laser_properties["self.burst_rate"] = 0
         self.laser_properties["self.current_intensity_p"] = self.laser_frame.left_container.magnitude_value.get() 
@@ -204,7 +204,8 @@ class RightContainer(ttk.Frame):
         self.consigne_before = self.laser_frame.main_app.communication_laser.laser_properties
 
         
-#        
+
+
 #        for x_values, y_values in zip(self.consigne.items(), self.consigne_before.items()):       
 #            if x_values == y_values:
 #                print(1,x_values)
@@ -214,7 +215,7 @@ class RightContainer(ttk.Frame):
 #                print(3,x_values)
 #                print(4,y_values)
 #                self.laser_frame.new_commands_list += str(x_values)
-        print ("new_commands_list =",self.laser_frame.new_commands_list)
+        
         self.laser_frame.new_commands_list = ''
         
                 

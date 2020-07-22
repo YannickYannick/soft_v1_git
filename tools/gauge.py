@@ -182,6 +182,8 @@ class Gauge(ttk.Frame):
     
     def set_value(self, value):
         self._value = value
+        print(value)
+        print(type(value))
         if self._min_value * 1.02 < value < self._max_value * 0.98:
             self._drawgauge()     # refresh all
 

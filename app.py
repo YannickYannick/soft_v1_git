@@ -30,14 +30,14 @@ class RepeatedFlashExperiment(tk.Tk):
         self.config(menu=self.main_menu)
         
         self.columnconfigure((0), weight=1)
-        self.rowconfigure((0), weight=1)
+        self.rowconfigure((1), weight=1)
         
         
         container = ttk.Frame(self, 
                               padding=10, 
                               style="MainContainer.TFrame",
                               )
-        container.grid(row=0, column=0, 
+        container.grid(row=1, column=0, 
                        sticky="NSEW")
         container.rowconfigure((0), weight=2)
         container.rowconfigure((1), weight=1)

@@ -23,14 +23,12 @@ class MainMenu(tk.Menu):
         self.helpmenu.add_command(label="About...", command=self.donothing)
         self.add_cascade(label="Help", menu=self.helpmenu)
         
-        self.img = Image.open("C:/Users/yannb/OneDrive/Pictures/play.PNG")
-        img = ImageTk.PhotoImage(self.img)
-      
 
-        exitButton = tk.Button(self.master, image=img, relief=tk.FLAT, command=self.test) #(y->m)
-        exitButton.image = img
-        exitButton.grid(row=0, column=0)
+
          
+                
+
+   
     def test(self):
         print(111111111111)
         

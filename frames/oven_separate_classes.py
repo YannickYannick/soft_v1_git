@@ -44,12 +44,13 @@ class OvenSeparate(ttk.Frame):
         
         left_container = LeftContainer(sub_container,
                         lambda: self.show_frame(self.manual_bot_container),
-                        lambda: self.show_frame(self.auto_bot_container)
+                        lambda: self.show_frame(self.auto_bot_container),
+                        self
                         )
         left_container.grid(row=0, column=0)
         
         
-        right_container = RightContainer(sub_container)
+        right_container = RightContainer(sub_container, self)
         right_container.grid(row=0, column=1)
         
         
@@ -75,13 +76,17 @@ class OvenSeparate(ttk.Frame):
                 
     def show_frame(self,frame):
         frame.tkraise()
+    
+
 
  
        
         
 class LeftContainer(ttk.Frame):
-    def __init__(self, container, show_manual, show_auto, **kwargs):
+    def __init__(self, container, show_manual, show_auto, oven_frame, **kwargs):
         super().__init__(container, **kwargs)
+        
+        self.oven_frame = oven_frame
         
         self.show_manual = show_manual
         self.show_auto = show_auto
@@ -92,8 +97,8 @@ class LeftContainer(ttk.Frame):
         vcmd = (self.register(self.onValidate),
                 '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
         
-        
-        gauge = Gauge(
+        self.gauge_value = tk.DoubleVar(value=0.0) 
+        self.gauge = Gauge(
             self,
             width=300, 
             height=150,
@@ -104,9 +109,10 @@ class LeftContainer(ttk.Frame):
             units='°C',
             bg="#D3E2F1"
         )
-        gauge.grid(column=0, row=0, sticky ="NESW") 
-        gauge.set_value(800)
+        self.gauge.grid(column=0, row=0, sticky ="NESW") 
         
+        self.gauge.set_value(0)
+        self.set_temperature()
         
         
         selection_temp_container= ttk.LabelFrame(self,
@@ -253,14 +259,35 @@ class LeftContainer(ttk.Frame):
         self.number_point['state']='disabled'
         self.temperature_max['state']='disabled'
         self.temperature_min['state']='disabled'
+        
+        
+    def set_temperature(self):
+        coucou = self.oven_frame.main_app.communication_oven.real_temperaturee*10
+        print("set_temperature", coucou)
+        print("type", type(coucou))
+        self.gauge.set_value(float(coucou))
+#        current_temperature = 60
+#        final_temperature = 60
+#        remain=self.remain_time.get()
+#        if current_temperature == final_temperature :
+#            seconds = int(remain)
+#            if seconds > 0 :
+#                remain = seconds - 1
+           
+        
+        self.gauge_value.set(f"{coucou}")    
+        self._timer_decrement_job1 = self.after(1000, self.set_temperature)
+        
+        
+    
+    
 
-  
       
         
 class RightContainer(ttk.Frame):
-    def __init__(self, container, **kwargs):
+    def __init__(self, container, oven_frame, **kwargs):
         super().__init__(container,**kwargs)
-  
+        self.oven_frame = oven_frame
         self.rowconfigure((0,1,2), weight=1)
         self.columnconfigure((0), weight=1)
         
@@ -375,7 +402,7 @@ class RightContainer(ttk.Frame):
         stop_button.grid(row=0, column=2)
         
         next_button = ttk.Button(button_container, text="Next", width=6, 
-                                  style="Button.TButton")
+                                  style="Button.TButton",  command=self.next_temperature)
         next_button.grid(row=0, column=1)
         
         
@@ -401,6 +428,10 @@ class RightContainer(ttk.Frame):
         self.remain_time.set(f"{value}") 
         self.remaining_time()
         
+    def next_temperature (self) :
+        self.oven_frame.main_app.communication_oven.temperature_iterator += 1
+        self.oven_frame.main_app.communication_oven.next_temperature()
+        print ("order",self.oven_frame.main_app.communication_oven.order_temperature)
         
     def remaining_time(self):
         current_temperature = 60

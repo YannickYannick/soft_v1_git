@@ -41,9 +41,9 @@ class CommunicationOven(threading.Thread):
         self.arret = False
         threading.Thread.__init__(self)
         
-        self.real_temperature = 0
+        self.real_temperaturee = 0
 
-#        self.arduino_I2C = serial.Serial('COM9', baudrate = 9600, timeout = 1)
+        self.arduino_I2C = serial.Serial('COM9', baudrate = 9600, timeout = 1)
 
         threading.Thread.__init__(self)
         self.arret = False
@@ -55,7 +55,7 @@ class CommunicationOven(threading.Thread):
         self.erreur = 0
         self.order_temperature = 0
         self.erreur_liste = []
-        self.temperature_iterator = 3
+        self.temperature_iterator = 0
 
 
         self.proportional_error = self.erreur
@@ -114,7 +114,7 @@ class CommunicationOven(threading.Thread):
     
     def run(self ):
         for i in range (1000000000000):
-#            self.real_temperature = getValues(self.arduino_I2C, self.application.regulation_fonction_output)
+            self.real_temperature = getValues(self.arduino_I2C, self.output)
             time.sleep(0.2)
             try:
                 self.real_temperature = float(self.real_temperature )
@@ -122,13 +122,14 @@ class CommunicationOven(threading.Thread):
                 self.real_temperature  = 0
             
       
-            #self.real_temperature = self.application.real_temperature# getValues(self.arduino_I2C, self.application.regulation_fonction_output)
-       
+            
+#            print(self.real_temperature) 
 
             self.time = time.perf_counter()-self.initial_time               # enregistrement du temps
             self.order_temperature = self.order_temperature + self.temperature_compensation   # accède à la order_temperature
             
-            self.real_temperature = self.real_temperature           # accède à la température                       
+            
+                      
             try:
                 self.real_temperature = float(self.real_temperature)  
             except:                                                         # 
@@ -247,7 +248,8 @@ class CommunicationOven(threading.Thread):
             else :
                 self.order_temperature_respected = False
                 self.timer  = self.timer_fixe 
-                
+            
+            self.real_temperaturee = self.real_temperature   
             time.sleep(0.1)
  
     
@@ -262,10 +264,20 @@ class CommunicationOven(threading.Thread):
         
     def update_temperatures(self):
         
-        self.order_temperature = float(self.list_temperatures_ordered[self.temperature_iterator])
-        print(self.order_temperature)
-        pass
-
+        
+        self.list_temperatures_ordered = self.list_temperatures_ordered[1:-1]
+        print(self.list_temperatures_ordered)
+        print(type(self.list_temperatures_ordered))
+        self.li = list(self.list_temperatures_ordered.split(", ")) 
+        self.li = [float(x) for x in self.li]
+        print(self.li)
+        print(type(self.li))
+        self.order_temperature = self.li[self.temperature_iterator]
+        
+    def next_temperature(self):
+        self.temperature_iterator += 1
+        self.order_temperature = self.li[self.temperature_iterator]
+        
 
         
 

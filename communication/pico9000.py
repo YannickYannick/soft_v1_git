@@ -11,19 +11,19 @@ import tkinter as tk
 
 
 
-#import win32com.client
+import win32com.client
 import numpy as np
 import matplotlib.pyplot as plt
 import time
 import threading
-#import pythoncom
+import pythoncom
 
 
-#import widgets_picoscope
 
 class CommunicationPicoscope(threading.Thread):
     def __init__(self, master):
         threading.Thread.__init__(self)
+        print("pico")
         self.picoscope_properties = {"self.average":0, "self.time_scale":0}
         
         
@@ -32,27 +32,27 @@ class CommunicationPicoscope(threading.Thread):
         self.data = [1,2,3,4,5]
 # comment deletting
         ############ MODEL #############
-        # self.COMRCW = win32com.client.Dispatch("PicoScope9000.COMRC") # create COM object   
-        # self.COMRCW.ExecCommand("Gui:Control:Invisible")
-        # self.COMRCW.ExecCommand("Header Off")
+        self.COMRCW = win32com.client.Dispatch("PicoScope9000.COMRC") # create COM object   
+        self.COMRCW.ExecCommand("Gui:Control:Invisible")
+        self.COMRCW.ExecCommand("Header Off")
         
-        # self.COMRCW.ExecCommand(" ACQuire:CH1:MODE AVGSTAB")
-        # self.picoscope_properties["self.average"] = self.COMRCW.ExecCommand("ACQuire:CH1:NAVG?")
-        # self.picoscope_properties["self.time_scale"] = self.COMRCW.ExecCommand("TB:ScaleA?") 
+        self.COMRCW.ExecCommand(" ACQuire:CH1:MODE AVGSTAB")
+        self.picoscope_properties["self.average"] = self.COMRCW.ExecCommand("ACQuire:CH1:NAVG?")
+        self.picoscope_properties["self.time_scale"] = self.COMRCW.ExecCommand("TB:ScaleA?") 
 
         
-        #  # Set up measurements
-        # self.COMRCW.ExecCommand("TB:ScaleA? 1m")  
-        # self.COMRCW.ExecCommand("Meas:Display:Param")
-        # self.COMRCW.ExecCommand("Meas:DisplSrc:Ch1")
-        # self.COMRCW.ExecCommand("Meas:Mode:Single")
-        # self.COMRCW.ExecCommand("Meas:Ch1:XParam:Freq 1")
-        # self.COMRCW.ExecCommand("Meas:Ch1:XParam:Rise 1")
-        # self.COMRCW.ExecCommand("Meas:Ch1:YParam:Max 1")
-        # self.COMRCW.ExecCommand("Meas:Ch1:YParam:Min 1")
-        # self.COMRCW.ExecCommand("Meas:Ch1:YParam:PP 1")
-        # self.COMRCW.ExecCommand("Trig:Mode Trig")
- #        self.COMRCW.ExecCommand("Trig:Source? Direct")
+          # Set up measurements
+        self.COMRCW.ExecCommand("TB:ScaleA? 1m")  
+        self.COMRCW.ExecCommand("Meas:Display:Param")
+        self.COMRCW.ExecCommand("Meas:DisplSrc:Ch1")
+        self.COMRCW.ExecCommand("Meas:Mode:Single")
+        self.COMRCW.ExecCommand("Meas:Ch1:XParam:Freq 1")
+        self.COMRCW.ExecCommand("Meas:Ch1:XParam:Rise 1")
+        self.COMRCW.ExecCommand("Meas:Ch1:YParam:Max 1")
+        self.COMRCW.ExecCommand("Meas:Ch1:YParam:Min 1")
+        self.COMRCW.ExecCommand("Meas:Ch1:YParam:PP 1")
+        self.COMRCW.ExecCommand("Trig:Mode Trig")
+        self.COMRCW.ExecCommand("Trig:Source? Direct")
         
         
         self.data = range(512)
@@ -62,9 +62,10 @@ class CommunicationPicoscope(threading.Thread):
 
     
     def run(self):
-        for i in range(10):
-            #pythoncom.CoInitialize()
-            #self.COMRCW = win32com.client.Dispatch("PicoScope9000.COMRC")
+        for i in range(10000):
+            pythoncom.CoInitialize()
+            self.COMRCW = win32com.client.Dispatch("PicoScope9000.COMRC")
+            self.COMRCW.ExecCommand("Gui:Control:Invisible")
             
             
             #déclenchement lors d'un changement de valeur
@@ -74,22 +75,23 @@ class CommunicationPicoscope(threading.Thread):
                 print("melina",self.picoscope_properties["self.average"]) #niveau 2
                 
                 
-                #niveau 3
-                #self.command = "ACQuire:CH1:NAVG " + self.picoscope_properties["self.average"]
-                #self.COMRCW.ExecCommand(self.command) #update time scale
+         
+                self.command = "ACQuire:CH1:NAVG " + str(self.picoscope_properties["self.average"])
+                print(self.command)
+                self.COMRCW.ExecCommand(self.command) #update time scale
                
              
                            
                 self.average_before = self.picoscope_properties["self.average"]
                 
-            #self.strdata = self.COMRCW.ExecCommand("Wfm:Data?")
+            self.strdata = self.COMRCW.ExecCommand("Wfm:Data?")
             self.strdata = str(self.strdata)
             self.strdata = self.strdata.split(',')
             self.strdata = np.asarray(self.strdata)   
-            #self.data = self.strdata.astype(np.float)
-            
+            self.data = self.strdata.astype(np.float)
+#            print(self.data[:5])
         
-            time.sleep(1) #1 second = un peu lent
+            time.sleep(2) #1 second = un peu lent
             
  
         
